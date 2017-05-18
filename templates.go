@@ -80,6 +80,14 @@ comments:
     {{ or .body "" | indent 4}}
 {{end}}
 {{end -}}
+{{if .github.detail -}}
+{{range $ghDetailIndex, $ghDetail := .github.detail}}
+{{range $prIndex, $pr := $ghDetail.pullRequests}} PullRequest: id={{ $pr.id }}, status={{ $pr.status }}, lastUpdate={{ $pr.lastUpdate }}
+{{end}}
+{{end}}
+changelog:
+[{{ .fields.issuetype.name }}] [{{ .key }}]({{ .endpoint }}/browse/{{ .key }}) {{ .fields.summary }}  {{range $ghDetailIndex, $ghDetail := .github.detail}}{{range $prIndex, $pr := $ghDetail.pullRequests}}{{ if eq $pr.status "MERGED"}}{{ $pr.id }} {{end}}{{end}}{{end}}
+{{end -}}
 `
 const defaultEditTemplate = `{{/* edit template */ -}}
 # issue: {{ .key }}

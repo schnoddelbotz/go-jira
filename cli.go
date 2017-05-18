@@ -487,6 +487,21 @@ func (c *Cli) ViewIssue(issue string) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	// Get issue-related GitHub PullRequest details
+	issueDetails, ok := data.(map[string]interface{})
+	if ok {
+		timeStamp := time.Now().Unix()
+		ghargs := fmt.Sprintf("issueId=%s&applicationType=github&dataType=pullrequest&_=%d", issueDetails["id"], timeStamp)
+		ghuri := fmt.Sprintf("%s/rest/dev-status/1.0/issue/detail?%s", c.endpoint, ghargs)
+		ghdata, err := responseToJSON(c.get(ghuri))
+		if err == nil {
+			issueDetails["github"] = ghdata
+			issueDetails["endpoint"] = c.endpoint
+			return issueDetails, nil
+		}
+	}
+
 	return data, nil
 }
 
